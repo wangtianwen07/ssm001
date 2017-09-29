@@ -1,0 +1,67 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+		
+	<!-- 开启spring组件自动扫描，如@Controller/@Service等 -->
+	<context:component-scan base-package="com.wtw"/>  
+	<!-- 加载数据库配置文件 -->
+	<!-- context:property-placeholder有时会有问题，推荐使用org.springframework.beans.factory.config.PropertyPlaceholderConfigurer来加载配置文件 -->
+	<!-- <context:property-placeholder location="classpath:db.properties"/> -->
+	<bean id="propertyConfigurer"  
+        class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">  
+        <property name="location" value="classpath:db.properties" />  
+    </bean>
+    
+	<!-- 配置数据源 -->
+	<!-- <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="url" value="jdbc:mysql://10.192.2.250:3306/ebs?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true"/>
+		<property name="username" value="ebs"/>
+		<property name="password" value="cs@675hji23jld39.93f"/>
+	</bean> -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName">
+			<value>${driver}</value>
+		</property>
+		<property name="url">
+			<value>${url}</value>
+		</property>
+		<property name="username">
+			<value>${username}</value>
+		</property>
+		<property name="password">
+			<value>${password}</value>
+		</property>
+	</bean>
+	
+	<!-- 给构造mybatis的mybatis-spring的SqlSessionFactoryBean注入这个数据源 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<!-- 注入mybatis的配置参数 -->
+		<property name="configLocation" value="classpath:mybatis-configuration.xml"/>
+	</bean>
+	
+	<!-- Mapper -->
+	<!-- 下面通过$来引入的方式不能起作用，参考博文:使用context:property-placeholder载不进属性原因分析与解决方案 http://blog.csdn.net/lklinkang/article/details/8309929-->
+	<!-- 
+	在spring里使用org.mybatis.spring.mapper.MapperScannerConfigurer 进行自动扫描的时候，设置了sqlSessionFactory 的话，可能会导致PropertyPlaceholderConfigurer失效，
+	也就是用${jdbc.username}这样之类的表达式，将无法获取到properties文件里的内容。 导致这一原因是因为，MapperScannerConigurer实际是在解析加载bean定义阶段的，这个时候要是设置sqlSessionFactory的话，会导致提前初始化一些类，
+	这个时候，PropertyPlaceholderConfigurer还没来得及替换定义中的变量，导致把表达式当作字符串复制了。
+	(下面是解决的方法：)
+	 
+	 改用sqlSessionFactoryBeanName注入就没有问题(不要使用sqlSessionFactory属性注入，使用sqlSessionFactoryBeanName注入)，因为这时不会立即初始化sqlSessionFactory,传入的只是名字，非bean，所以不会引发提前初始化问题。。
+	 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 是不是可以不配置呢？因为mapper映射器配置到mybatis的xml配置文件中了mybatis-configuration.xml 待验证.不行！必须配置在这儿，mybatis-configuration.xml中可以不配置。-->
+		<property name="basePackage" value="com.wtw.dao"/>
+		<!-- 如果要用到$取配置文件中的参数，如${username}等 不能使用这个方式 -->
+		<!-- <property name="sqlSessionFactory" ref="sqlSessionFactory"/> -->
+		<!-- 用sqlSessionFactoryBeanName这个方式注入的话，可以使用配置文件中的参数，如：${driver} -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+	</bean>
+	
+</beans>

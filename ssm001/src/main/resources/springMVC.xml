@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/mvc
+	http://www.springframework.org/schema/mvc/spring-mvc.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<!-- @Controller组件扫描 -->
+	<context:component-scan base-package="com.wtw.controller"></context:component-scan>
+	
+	<!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter"></bean>
+	<bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping"></bean> -->
+	
+	<!-- 经默认注册了
+		一个 RequestMappingHandlerMapping 、
+		一 个 RequestMappingHandlerAdapter ，以及
+		一个 ExceptionHandlerExceptionResolver -->
+	
+	<mvc:annotation-driven />
+	
+	<!-- 静态资源文件，不会被springmvc拦截的配置。 
+		如果不配置则jsp中<script type="text/javascript" src="<%=basePath%>resources/jquery-3.2.1.js"></script>
+		都会被拦截导致报错-->
+	<mvc:resources location="/resources/" mapping="/resources/**"></mvc:resources>
+	
+	<!-- 视图解析器 -->
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/JSP/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	
+	<!-- 文件上传配置 -->
+	<!-- <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="1024000"/>
+		<property name="maxInMemorySize" value="12040"/>
+		<property name="defaultEncoding" value="utf-8"/>
+	</bean> -->
+</beans>
