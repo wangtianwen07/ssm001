@@ -1,3 +1,3 @@
-github ��֧��ϲ���֧
-��֧��master��֧���ȶ��ģ�������Աfork��������֧��֧�п����°汾���롣
-��֧�ϲ������°汾��ɺ󣬿�����Աpull request����Ŀ�����˿ɿ���������Ա�ύ�ķ�֧���벢�ɺϲ���merge)������֧�С�
+github 分支与合并分支
+分支：master分支是稳定的，开发人员fork下来，在支分支中开发新版本代码。
+分支合并：当新版本完成后，开发人员pull request，项目负责人可看到开发人员提交的分支代码并可合并（merge)到主分支中。
